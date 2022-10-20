@@ -17,7 +17,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Engine" />
+      <ProjectReference Include="..\CampaignEngine\CampaignEngine.csproj" />
     </ItemGroup>
 
 </Project>
