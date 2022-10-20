@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace HesehusCampaignEngine.Domain
+namespace CampaignEngine.Domain
 {
     public class BasketActivation
     {
