@@ -1,7 +1,5 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HesehusCampaignEngine", "HesehusCampaignEngine\HesehusCampaignEngine.csproj", "{A8CB0017-50F4-4850-B7EE-68590203A220}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test", "Test\Test.csproj", "{BA8C9671-BBC4-4C32-B8F2-33D22659EF6C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CampaignEngine", "CampaignEngine\CampaignEngine.csproj", "{39F66602-C053-49CF-ACB6-E391A4DF4CC4}"
@@ -12,10 +10,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{A8CB0017-50F4-4850-B7EE-68590203A220}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A8CB0017-50F4-4850-B7EE-68590203A220}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A8CB0017-50F4-4850-B7EE-68590203A220}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A8CB0017-50F4-4850-B7EE-68590203A220}.Release|Any CPU.Build.0 = Release|Any CPU
 		{BA8C9671-BBC4-4C32-B8F2-33D22659EF6C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{BA8C9671-BBC4-4C32-B8F2-33D22659EF6C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BA8C9671-BBC4-4C32-B8F2-33D22659EF6C}.Release|Any CPU.ActiveCfg = Release|Any CPU
