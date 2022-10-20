@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test", "Test\Test.csproj", "{BA8C9671-BBC4-4C32-B8F2-33D22659EF6C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CampaignEngine", "CampaignEngine\CampaignEngine.csproj", "{39F66602-C053-49CF-ACB6-E391A4DF4CC4}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BA8C9671-BBC4-4C32-B8F2-33D22659EF6C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BA8C9671-BBC4-4C32-B8F2-33D22659EF6C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BA8C9671-BBC4-4C32-B8F2-33D22659EF6C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BA8C9671-BBC4-4C32-B8F2-33D22659EF6C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{39F66602-C053-49CF-ACB6-E391A4DF4CC4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{39F66602-C053-49CF-ACB6-E391A4DF4CC4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{39F66602-C053-49CF-ACB6-E391A4DF4CC4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{39F66602-C053-49CF-ACB6-E391A4DF4CC4}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
