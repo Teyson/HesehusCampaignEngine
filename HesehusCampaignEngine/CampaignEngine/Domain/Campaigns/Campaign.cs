@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace HesehusCampaignEngine.Domain.Campaigns
+namespace CampaignEngine.Domain.Campaigns
 {
     public class Campaign
     {

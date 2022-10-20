@@ -1,4 +1,4 @@
-﻿namespace HesehusCampaignEngine.Domain
+﻿namespace CampaignEngine.Domain
 {
     public class Product
     {

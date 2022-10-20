@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using HesehusCampaignEngine.Domain;
-using HesehusCampaignEngine.Domain.Campaigns;
+using CampaignEngine.Domain;
+using CampaignEngine.Domain.Campaigns;
 
-namespace HesehusCampaignEngine.Engine
+namespace CampaignEngine.Engine
 {
     public class CampaignEngine
     {
