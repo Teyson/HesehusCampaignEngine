@@ -42,7 +42,8 @@ namespace Test.Engine
             HashSet<Campaign> campaigns = new(){c1, c2, c3};
 
             //Act
-            var calculatedBasket = CampaignEngine.CalculatePrice(basketLines, campaigns);
+            var calculatedBasket = 
+                CampaignEngine.Engine.CampaignEngine.CalculatePrice(basketLines, new HashSet<Campaign>());
 
             //Assert
             Assert.That(calculatedBasket.Total, Is.EqualTo(300));
@@ -85,7 +86,8 @@ namespace Test.Engine
             HashSet<Campaign> campaigns = new(){c1, c2, c3, c4};
 
             //Act
-            var calculatedBasket = CampaignEngine.CalculatePrice(basketLines, campaigns);
+            var calculatedBasket = 
+                CampaignEngine.Engine.CampaignEngine.CalculatePrice(basketLines, new HashSet<Campaign>());
 
             //Assert
             Assert.That(calculatedBasket.Total, Is.EqualTo(765));
