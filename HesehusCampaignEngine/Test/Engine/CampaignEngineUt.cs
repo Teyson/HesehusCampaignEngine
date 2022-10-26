@@ -1,9 +1,7 @@
 ﻿using System.Collections.Generic;
-using System.ComponentModel.Design;
 using CampaignEngine.Domain;
 using CampaignEngine.Domain.Campaigns;
 using NUnit.Framework;
-using CampaignEngine = CampaignEngine.Engine.CampaignEngine;
 
 namespace Test.Engine
 {
@@ -11,7 +9,7 @@ namespace Test.Engine
     [TestFixture]
     public class CampaignEngineUt
     {
-        private global::CampaignEngine.Engine.CampaignEngine _campaignEngine;
+        private CampaignEngine.Engine.CampaignEngine _campaignEngine;
 
         [SetUp]
         public void SetUp()
