@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using CampaignEngine.Domain;
 using CampaignEngine.Domain.Campaigns;
 using NUnit.Framework;
@@ -41,8 +42,19 @@ namespace Test.Engine
             Product p1 = new Product("1", 200);
             Product p2 = new Product("2", 100);
             Product p3 = new Product("3", 300);
+            Product p4 = new Product("4", 100);
 
-            List<OrderLine> basketLines = new() {new OrderLine(p1, 1), new OrderLine(p2, 1)};
+            List<OrderLine> basketLines = new()
+            {
+                new OrderLine(p1,
+                    1),
+                new OrderLine(p2,
+                    1),
+                new OrderLine(p3,
+                    1),
+                new OrderLine(p4,
+                    2)
+            };
 
             Campaign c1 = new DiscountCampaign("c1", new HashSet<Product>() {p1}, 1, 50);
             Campaign c2 = new DiscountCampaign("c2", new HashSet<Product>() {p2}, 1, 50);
@@ -52,15 +64,16 @@ namespace Test.Engine
 
             //Act
             var calculatedBasket = 
-                _campaignEngine.CalculatePrice(basketLines, new HashSet<Campaign>());
+                _campaignEngine.CalculatePrice(basketLines, campaigns);
 
             //Assert
-            Assert.That(calculatedBasket.Total, Is.EqualTo(300));
+            Assert.That(calculatedBasket.Total, Is.EqualTo(500));
         }
         
         [Test]
         public void CalculatePrice_Returns_CorrectPrice_HighStress()
         {
+            
             //Arrange
             Product p1 = new Product("1", 100);
             Product p2 = new Product("2", 100);
@@ -95,9 +108,12 @@ namespace Test.Engine
             HashSet<Campaign> campaigns = new(){c1, c2, c3, c4};
 
             //Act
+            var start = DateTime.Now;
             var calculatedBasket = 
-                _campaignEngine.CalculatePrice(basketLines, new HashSet<Campaign>());
-
+                _campaignEngine.CalculatePrice(basketLines, campaigns);
+            
+            Console.WriteLine(DateTime.Now.Subtract(start));
+            
             //Assert
             Assert.That(calculatedBasket.Total, Is.EqualTo(765));
         }
