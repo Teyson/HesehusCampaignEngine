@@ -34,5 +34,10 @@ namespace CampaignEngine.Domain
         public Campaign Campaign { get; set; }
         public HashSet<Product> AffectedProducts { get; set; }
         public decimal Total { get; set; }
+
+        public bool Contains(Product p)
+        {
+            return AffectedProducts.Contains(p);
+        }
     }
 }
