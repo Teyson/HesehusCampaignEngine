@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using CampaignEngine.Domain;
 using CampaignEngine.Domain.Campaigns;
 using NUnit.Framework;
@@ -8,14 +9,14 @@ namespace Test.Engine
 {
 
     [TestFixture]
-    public class CampaignEngineUt
+    public class EngineUt
     {
-        private CampaignEngine.Engine.CampaignEngine _campaignEngine;
+        private CampaignEngine.Engine.Engine _campaignEngine;
 
         [SetUp]
         public void SetUp()
         {
-            _campaignEngine = new global::CampaignEngine.Engine.CampaignEngine();
+            _campaignEngine = new global::CampaignEngine.Engine.Engine();
         }
         
         [Test]
@@ -108,12 +109,14 @@ namespace Test.Engine
             HashSet<Campaign> campaigns = new(){c1, c2, c3, c4};
 
             //Act
-            var start = DateTime.Now;
+            var start = Stopwatch.StartNew();
             var calculatedBasket = 
                 _campaignEngine.CalculatePrice(basketLines, campaigns);
-            
-            Console.WriteLine(DateTime.Now.Subtract(start));
-            
+
+            var elapsed = start.Elapsed.TotalSeconds;
+            Console.WriteLine(elapsed);
+            Console.WriteLine(_campaignEngine._basketActivations.Count + " - " + _campaignEngine._campaignActivations.Count);
+
             //Assert
             Assert.That(calculatedBasket.Total, Is.EqualTo(765));
         }

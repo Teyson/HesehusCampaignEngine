@@ -2,7 +2,7 @@
 
 namespace CampaignEngine.Domain.Campaigns
 {
-    public class Campaign
+    public abstract class Campaign
     {
         public string Id { get; set; }
         public HashSet<Product> AffectedProducts { get; set; }
@@ -13,6 +13,11 @@ namespace CampaignEngine.Domain.Campaigns
             Id = id;
             AffectedProducts = affectedProducts;
             ProductsToActivate = productsToActivate;
+        }
+
+        public override string ToString()
+        {
+            return $"Id: {Id} || ProductsToActivate: {ProductsToActivate} || Type: {this.GetType()}";
         }
     }
 }

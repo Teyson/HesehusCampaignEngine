@@ -37,5 +37,10 @@ namespace CampaignEngine.Domain
         {
             return HashCode.Combine(Id, Price);
         }
+
+        public override string ToString()
+        {
+            return $"Id: {Id} || subId: {SubId} || Price: {Price}";
+        }
     }
 }

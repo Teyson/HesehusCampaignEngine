@@ -5,10 +5,10 @@ using CampaignEngine.Domain.Campaigns;
 
 namespace CampaignEngine.Engine
 {
-    public class CampaignEngine
+    public class Engine
     {
-        private HashSet<BasketActivation> _basketActivations = new();
-        private List<CampaignActivation> _campaignActivations = new();
+        public HashSet<BasketActivation> _basketActivations { get; set; } = new();
+        public List<CampaignActivation> _campaignActivations { get; set; }= new();
 
         /// <summary>
         /// Finds the cheapest possible combination of campaigns in the basket.
