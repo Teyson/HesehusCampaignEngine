@@ -109,11 +109,11 @@ namespace Test.Engine
             HashSet<Campaign> campaigns = new(){c1, c2, c3, c4};
 
             //Act
-            var start = Stopwatch.StartNew();
+            var stopwatch = Stopwatch.StartNew();
             var calculatedBasket = 
                 _campaignEngine.CalculatePrice(basketLines, campaigns);
 
-            var elapsed = start.Elapsed.TotalSeconds;
+            var elapsed = stopwatch.Elapsed.TotalSeconds;
             Console.WriteLine(elapsed);
             Console.WriteLine(_campaignEngine._basketActivations.Count + " - " + _campaignEngine._campaignActivations.Count);
 
