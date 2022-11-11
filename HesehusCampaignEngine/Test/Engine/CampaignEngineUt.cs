@@ -1,21 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using CampaignEngine.Domain;
 using CampaignEngine.Domain.Campaigns;
 using NUnit.Framework;
 
 namespace Test.Engine
 {
-
     [TestFixture]
-    public class CampaignEngineUt
+    public class EngineUt
     {
-        private CampaignEngine.Engine.CampaignEngine _campaignEngine;
+        private CampaignEngine.Engine.Engine _engine;
 
         [SetUp]
         public void SetUp()
         {
-            _campaignEngine = new global::CampaignEngine.Engine.CampaignEngine();
+            _engine = new global::CampaignEngine.Engine.Engine();
         }
         
         [Test]
@@ -29,7 +29,7 @@ namespace Test.Engine
 
             //Act
             var calculatedBasket =
-                _campaignEngine.CalculatePrice(basketLines, new HashSet<Campaign>());
+                _engine.CalculatePrice(basketLines, new HashSet<Campaign>());
 
             //Assert
             Assert.That(calculatedBasket.Total, Is.EqualTo(300));
@@ -64,7 +64,7 @@ namespace Test.Engine
 
             //Act
             var calculatedBasket = 
-                _campaignEngine.CalculatePrice(basketLines, campaigns);
+                _engine.CalculatePrice(basketLines, campaigns);
 
             //Assert
             Assert.That(calculatedBasket.Total, Is.EqualTo(500));
@@ -108,12 +108,14 @@ namespace Test.Engine
             HashSet<Campaign> campaigns = new(){c1, c2, c3, c4};
 
             //Act
-            var start = DateTime.Now;
+            var stopwatch = Stopwatch.StartNew();
             var calculatedBasket = 
-                _campaignEngine.CalculatePrice(basketLines, campaigns);
-            
-            Console.WriteLine(DateTime.Now.Subtract(start));
-            
+                _engine.CalculatePrice(basketLines, campaigns);
+
+            var elapsed = stopwatch.Elapsed.TotalSeconds;
+            Console.WriteLine(elapsed);
+            Console.WriteLine("n: " + _engine._campaignActivations.Count + "\nIterations: " + _engine._campaignActivations.Count);
+
             //Assert
             Assert.That(calculatedBasket.Total, Is.EqualTo(765));
         }
