@@ -5,7 +5,7 @@ using CampaignEngine.Domain.Campaigns;
 
 namespace CampaignEngine.Engine
 {
-    public class CampaignEngine
+    public class Engine
     {
         public HashSet<BasketActivation> _basketActivations = new();
         public List<CampaignActivation> _campaignActivations = new();
