@@ -28,8 +28,9 @@ namespace Test.Domain.Campaigns
         {
             //Arrange
             Product p1 = new("1", 100);
+            Product p2 = new("2", 100);
 
-            DiscountCampaign c1 = new("A", new HashSet<Product>() {p1}, 1, 50);
+            DiscountCampaign c1 = new("A", new HashSet<Product>() {p1, p2}, 1, 50);
             
             //Act
             CampaignActivation CA1 = new(c1, new HashSet<Product>() {p1});
