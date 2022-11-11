@@ -10,6 +10,12 @@ namespace CampaignEngine.Domain.Campaigns
             Discount = discount;
         }
         
+        public override decimal CalculatePrice(HashSet<Product> activatedProducts)
+        {
+            var sum1 = activatedProducts.Sum(x => x.Price);
+            return sum1 - Discount;
+        }
+
         public decimal Discount { get; set; }
     }
 }
