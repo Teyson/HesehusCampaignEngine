@@ -10,7 +10,7 @@ namespace CampaignEngine.Domain
         {
             Campaign = campaign;
             AffectedProducts = affectedProducts;
-            Total = campaign.CalculatePrice(affectedProducts);
+            Total = Campaign.CalculatePrice(affectedProducts);
         }
 
         public Campaign Campaign { get; set; }
