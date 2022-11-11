@@ -10,25 +10,7 @@ namespace CampaignEngine.Domain
         {
             Campaign = campaign;
             AffectedProducts = affectedProducts;
-
-            switch (Campaign)
-            {
-                case PercentCampaign pC:
-                    var sum = AffectedProducts.Sum(x => x.Price);
-                    Total = sum - (sum * pC.DiscountPercentage / 100);
-                    break;
-                case DiscountCampaign dC:
-                    var sum1 = AffectedProducts.Sum(x => x.Price);
-                    Total = sum1 - dC.Discount;
-                    break;
-                case SetPriceCampaign sPC:
-                    Total = sPC.NewTotalPrice;
-                    break;
-                default:
-                    var sum2 = AffectedProducts.Sum(x => x.Price);
-                    Total = sum2;
-                    break;
-            }
+            Total = campaign.CalculatePrice(affectedProducts);
         }
 
         public Campaign Campaign { get; set; }

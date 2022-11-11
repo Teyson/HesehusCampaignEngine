@@ -7,8 +7,8 @@ namespace CampaignEngine.Engine
 {
     public class CampaignEngine
     {
-        private HashSet<BasketActivation> _basketActivations = new();
-        private List<CampaignActivation> _campaignActivations = new();
+        public HashSet<BasketActivation> _basketActivations = new();
+        public List<CampaignActivation> _campaignActivations = new();
 
         /// <summary>
         /// Finds the cheapest possible combination of campaigns in the basket.

@@ -10,6 +10,11 @@ namespace CampaignEngine.Domain.Campaigns
             NewTotalPrice = newTotalPrice;
         }
         
+        public override decimal CalculatePrice(HashSet<Product> activatedProducts)
+        {
+            return NewTotalPrice;
+        }
+        
         public decimal NewTotalPrice { get; set; }
     }
 }
