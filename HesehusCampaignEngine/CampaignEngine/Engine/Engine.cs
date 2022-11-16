@@ -19,7 +19,7 @@ namespace CampaignEngine.Engine
         public CalculatedBasket CalculatePrice(List<OrderLine> basketLines, HashSet<Campaign> campaignsInBasket)
         {
             if (!basketLines.Any())
-                return new CalculatedBasket(0);
+                return new CalculatedBasket(0, new HashSet<CampaignActivation>(), new List<Product>());
 
             var products = basketLines.SelectMany(orderLine =>
             {
@@ -159,18 +159,15 @@ namespace CampaignEngine.Engine
             {
                 var valid = basketActivation.IsValid();
 
-                if (!valid)
-                {
-                    continue;
-                }
-                
+                if (!valid) continue;
+
                 basketActivation.UpdateUnaffectedProducts(products);
                 basketActivation.UpdateTotal();
                 if (basketActivation.Total < cheapest.Total)
                     cheapest = basketActivation;
             }
 
-            return new CalculatedBasket(cheapest.Total);
+            return new CalculatedBasket(cheapest.Total, cheapest.CampaignsInEffect, cheapest.UnaffectedProducts);
         }
     }
 }
