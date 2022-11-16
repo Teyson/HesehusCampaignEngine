@@ -1,7 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using CampaignEngine.Domain;
+﻿using CampaignEngine.Domain;
 using CampaignEngine.Domain.Campaigns;
+using CampaignEngine.Domain.UndirectedGraph;
 
 namespace CampaignEngine.Engine
 {
@@ -42,12 +41,34 @@ namespace CampaignEngine.Engine
 
             _campaignActivations = GenerateCampaignActivations(basketProductsAffectedByCampaigns, campaignsInBasket);
 
+            var campaignOverlaps = GenerateCampaignOverlaps();
+
             if (_campaignActivations.Any())
-                GenerateBasketActivations(0, new BasketActivation());
+                GenerateBasketActivations(0, new BasketActivation(), campaignOverlaps);
 
             var cheapestBasket = GetCheapestBasketActivation(products);
 
             return cheapestBasket;
+        }
+
+        private UndirectedGraph<CampaignActivation> GenerateCampaignOverlaps()
+        {
+            var graph = new UndirectedGraph<CampaignActivation>(_campaignActivations);
+
+            for (var i = 0; i < _campaignActivations.Count; i++)
+            for (var j = i + 1; j < _campaignActivations.Count; j++)
+            {
+                if (i == j)
+                    continue;
+
+                var campaignActivation1 = _campaignActivations[i];
+                var campaignActivation2 = _campaignActivations[j];
+
+                if (campaignActivation1.HasOverlap(campaignActivation2))
+                    graph.AddEdge(_campaignActivations[i], _campaignActivations[j]);
+            }
+
+            return graph;
         }
 
         private List<CampaignActivation> GenerateCampaignActivations(
@@ -76,7 +97,7 @@ namespace CampaignEngine.Engine
             List<Product> productsHitByCampaign,
             Campaign campaign)
         {
-            Product[] tempActivation = new Product[campaign.ProductsToActivate];
+            var tempActivation = new Product[campaign.ProductsToActivate];
 
             List<Product[]> activations = new();
 
@@ -118,7 +139,7 @@ namespace CampaignEngine.Engine
             for (var i = start; i <= end && end - i + 1 >= campaignProductsToActivate - index; i++)
             {
                 tempActivation[index] = productsHitByCampaign[i];
-                var tempActivation2 = (Product[])tempActivation.Clone();
+                var tempActivation2 = (Product[]) tempActivation.Clone();
                 GenerateCampaignActivation(
                     productsHitByCampaign,
                     tempActivation2,
@@ -133,17 +154,22 @@ namespace CampaignEngine.Engine
 
         private void GenerateBasketActivations(
             int i,
-            BasketActivation unfinishedBasketActivation)
+            BasketActivation unfinishedBasketActivation,
+            UndirectedGraph<CampaignActivation> campaignOverlaps)
         {
             if (i >= _campaignActivations.Count)
                 _basketActivations.Add(unfinishedBasketActivation);
             else
             {
                 var s = unfinishedBasketActivation.Clone();
-                GenerateBasketActivations(i + 1, s);
-                var s2 = unfinishedBasketActivation.Clone();
-                s2.CampaignsInEffect.Add(_campaignActivations[i]);
-                GenerateBasketActivations(i + 1, s2);
+                GenerateBasketActivations(i + 1, s, campaignOverlaps);
+
+                if (!unfinishedBasketActivation.HasOverlap(_campaignActivations[i], campaignOverlaps))
+                {
+                    var s2 = unfinishedBasketActivation.Clone();
+                    s2.CampaignsInEffect.Add(_campaignActivations[i]);
+                    GenerateBasketActivations(i + 1, s2, campaignOverlaps);
+                }
             }
         }
 

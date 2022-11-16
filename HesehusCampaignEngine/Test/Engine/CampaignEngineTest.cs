@@ -19,7 +19,7 @@ public class CampaignEngineTest
     {
         var stopwatch = Stopwatch.StartNew();
 
-        for (var k = 0; k < 3; k++)
+        for (var k = 0; k < 1000; k++)
         {
             var seed = Guid.NewGuid().GetHashCode();
             var rng = new Random(seed);
@@ -38,7 +38,7 @@ public class CampaignEngineTest
             var result = engine.CalculatePrice(orderLines, campaigns);
             var timeElapsed = stopwatch.ElapsedMilliseconds;
 
-            if (timeElapsed <= 1 || engine._campaignActivations.Count < 8) continue;
+            if (engine._campaignActivations.Count < 8) continue;
             
             var config = new CsvConfiguration(CultureInfo.CurrentCulture)
             {
@@ -46,7 +46,7 @@ public class CampaignEngineTest
             };
 
             using (var stream = File.Open(
-                       "C:\\Users\\teis\\OneDrive\\Dokumenter\\Skole\\SDU\\Software\\7. semester\\4. Development\\HesehusCampaignEngine\\HesehusCampaignEngine\\Test\\TestCases.csv",
+                       "C:\\Users\\teis\\OneDrive\\Dokumenter\\Skole\\SDU\\Software\\7. semester\\4. Development\\HesehusCampaignEngine\\HesehusCampaignEngine\\Test\\TestCases_v2.csv",
                        FileMode.Append))
             using (var writer = new StreamWriter(stream))
             using (var csv = new CsvWriter(writer, config))
@@ -102,7 +102,7 @@ public class CampaignEngineTest
                 testCase.Seed));
         }
         
-        using (var writer = new StreamWriter("C:\\Users\\teis\\OneDrive\\Dokumenter\\Skole\\SDU\\Software\\7. semester\\4. Development\\HesehusCampaignEngine\\HesehusCampaignEngine\\Test\\TestResults.csv"))
+        using (var writer = new StreamWriter($"C:\\Users\\teis\\OneDrive\\Dokumenter\\Skole\\SDU\\Software\\7. semester\\4. Development\\HesehusCampaignEngine\\HesehusCampaignEngine\\Test\\TestResults_v2_{Guid.NewGuid()}.csv"))
         using (var csv = new CsvWriter(writer, CultureInfo.CurrentCulture))
         {
             csv.WriteRecords(testResults);
