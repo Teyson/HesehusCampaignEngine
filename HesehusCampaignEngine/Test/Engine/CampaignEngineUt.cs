@@ -114,7 +114,7 @@ namespace Test.Engine
 
             var elapsed = stopwatch.Elapsed.TotalSeconds;
             Console.WriteLine(elapsed);
-            Console.WriteLine("n: " + _engine._campaignActivations.Count + "\nIterations: " + _engine._campaignActivations.Count);
+            Console.WriteLine("n: " + _engine.CampaignActivations.Count + "\nIterations: " + _engine.CampaignActivations.Count);
 
             //Assert
             Assert.That(calculatedBasket.Total, Is.EqualTo(765));

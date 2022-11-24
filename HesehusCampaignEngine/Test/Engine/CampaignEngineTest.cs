@@ -38,7 +38,7 @@ public class CampaignEngineTest
             var result = engine.CalculatePrice(orderLines, campaigns);
             var timeElapsed = stopwatch.ElapsedMilliseconds;
 
-            if (engine._campaignActivations.Count < 8) continue;
+            if (engine.CampaignActivations.Count < 8) continue;
             
             var config = new CsvConfiguration(CultureInfo.CurrentCulture)
             {
@@ -54,9 +54,9 @@ public class CampaignEngineTest
                 csv.WriteRecords(new List<TestResult>
                 {
                     new(
-                        engine._campaignActivations.Count,
+                        engine.CampaignActivations.Count,
                         timeElapsed,
-                        engine._basketActivations.Count,
+                        engine.BasketActivations.Count,
                         AmountOfProductsLowerBound,
                         AmountOfProductsUpperBound,
                         AmountOfCampaignsLowerBound,
@@ -92,9 +92,9 @@ public class CampaignEngineTest
             var result = engine.CalculatePrice(orderLines, campaigns);
             var timeElapsed = stopwatch.ElapsedMilliseconds;
             
-            testResults.Add(new TestResult(engine._campaignActivations.Count,
+            testResults.Add(new TestResult(engine.CampaignActivations.Count,
                 timeElapsed,
-                engine._basketActivations.Count,
+                engine.BasketActivations.Count,
                 AmountOfProductsLowerBound,
                 AmountOfProductsUpperBound,
                 AmountOfCampaignsLowerBound,
@@ -156,7 +156,8 @@ public class CampaignEngineTest
 
         for (var i = 0; i < amountOfCampaigns; i++)
         {
-            var numberOfAffectedProducts = rng.Next(1, products.Count);
+            var keepRngSeed = rng.Next(1, products.Count);
+            var numberOfAffectedProducts = products.Count / 2;
             var affectedProducts = products.OrderBy(x => rng.Next()).Take(numberOfAffectedProducts).ToHashSet();
             var productsToActivate = rng.Next(1, affectedProducts.Count);
 
