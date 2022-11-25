@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-
-namespace CampaignEngine.Domain
+﻿namespace CampaignEngine.Domain.Products
 {
     public class Product : IEquatable<Product>
 

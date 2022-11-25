@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using CampaignEngine.Domain;
+using CampaignEngine.Domain.Activations;
 using CampaignEngine.Domain.Campaigns;
+using CampaignEngine.Domain.Products;
 using NUnit.Framework;
 
 namespace Test.Domain.Campaigns

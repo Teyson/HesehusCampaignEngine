@@ -1,8 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using CampaignEngine.Domain.Campaigns;
+﻿using CampaignEngine.Domain.Campaigns;
+using CampaignEngine.Domain.Products;
 
-namespace CampaignEngine.Domain
+namespace CampaignEngine.Domain.Activations
 {
     public class CampaignActivation
     {

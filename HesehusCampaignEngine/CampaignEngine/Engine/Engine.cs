@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using CampaignEngine.Domain;
+using CampaignEngine.Domain.Activations;
 using CampaignEngine.Domain.Campaigns;
+using CampaignEngine.Domain.Products;
 
 namespace CampaignEngine.Engine
 {

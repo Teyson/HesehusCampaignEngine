@@ -1,4 +1,4 @@
-﻿namespace CampaignEngine.Domain
+﻿namespace CampaignEngine.Domain.Products
 {
     public class OrderLine
     {

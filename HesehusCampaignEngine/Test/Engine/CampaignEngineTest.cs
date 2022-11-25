@@ -2,6 +2,7 @@
 using System.Globalization;
 using CampaignEngine.Domain;
 using CampaignEngine.Domain.Campaigns;
+using CampaignEngine.Domain.Products;
 using CsvHelper;
 using CsvHelper.Configuration;
 using Test.Helpers;
