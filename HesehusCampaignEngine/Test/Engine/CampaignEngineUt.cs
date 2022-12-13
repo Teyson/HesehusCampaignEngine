@@ -120,5 +120,24 @@ namespace Test.Engine
             //Assert
             Assert.That(calculatedBasket.Total, Is.EqualTo(765));
         }
+        
+        [Test]
+        public void Case_6_Of_Same_Product_Activation3_All_Overlap()
+        {
+            //Arrange
+            var p = new Product("test", 100);
+            var c = new SetPriceCampaign("0", new HashSet<Product>() {p}, 3, 50);
+            var orderLines = new List<OrderLine>() {new(p, 6)};
+
+            var engine = new CampaignEngine.Engine.Engine();
+            //Act
+            var stopWatch = Stopwatch.StartNew();
+            var basket = engine.CalculatePrice(orderLines, new HashSet<Campaign>() {c});
+            var elapsed = stopWatch.ElapsedMilliseconds;
+
+            //Assert
+            Console.WriteLine($"ElapsedTime = {elapsed}");
+            Assert.That(basket.Total, Is.EqualTo(100));
+        }
     }
 }

@@ -34,15 +34,15 @@ namespace CampaignEngine.Engine
                 return products;
             }).ToList();
 
-            var allProductsAffectedByCampaigns = campaignsInBasket
-                .SelectMany(x => x.AffectedProducts)
+            var campaignProductIds = campaignsInBasket
+                .SelectMany(x => x.AffectedProducts.Select(product => product.Id))
+                .ToHashSet();
+            
+            var allProductsAffectedByCampaigns = products
+                .Where(x => campaignProductIds.Contains(x.Id))
                 .ToHashSet();
 
-            var basketProductsOutsideCampaigns = products.Except(allProductsAffectedByCampaigns);
-
-            var basketProductsAffectedByCampaigns = products.Except(basketProductsOutsideCampaigns).ToHashSet();
-
-            _campaignActivations = GenerateCampaignActivations(basketProductsAffectedByCampaigns, campaignsInBasket);
+            _campaignActivations = GenerateCampaignActivations(allProductsAffectedByCampaigns, campaignsInBasket);
 
             if (_campaignActivations.Any())
                 GenerateBasketActivations(0, new BasketActivation());
@@ -61,7 +61,7 @@ namespace CampaignEngine.Engine
             foreach (var campaign in campaigns)
             {
                 var productsInCampaign = productsAffectedByCampaigns
-                    .Where(x => campaign.AffectedProducts.Contains(x))
+                    .Where(x => campaign.AffectedProducts.Select(product => product.Id).Contains(x.Id))
                     .ToList();
 
                 var combinationsForCampaign = GenerateCampaignActivationsForCampaign(

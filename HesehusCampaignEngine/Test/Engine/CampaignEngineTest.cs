@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics;
 using System.Globalization;
-using CampaignEngine.Domain;
 using CampaignEngine.Domain.Campaigns;
 using CampaignEngine.Domain.Products;
 using CsvHelper;
@@ -11,16 +10,16 @@ namespace Test.Engine;
 
 public class CampaignEngineTest
 {
-    private const int AmountOfProductsLowerBound = 2;
-    private const int AmountOfProductsUpperBound = 7;
-    private const int AmountOfCampaignsLowerBound = 2;
-    private const int AmountOfCampaignsUpperBound = 10;
+    private const int AmountOfProductsLowerBound = 3;
+    private const int AmountOfProductsUpperBound = 4;
+    private const int AmountOfCampaignsLowerBound = 3;
+    private const int AmountOfCampaignsUpperBound = 7;
 
     public static void GenerateTestCase()
     {
         var stopwatch = Stopwatch.StartNew();
 
-        for (var k = 0; k < 3; k++)
+        for (var k = 0; k < 10; k++)
         {
             var seed = Guid.NewGuid().GetHashCode();
             var rng = new Random(seed);
@@ -47,7 +46,7 @@ public class CampaignEngineTest
             };
 
             using (var stream = File.Open(
-                       "C:\\Users\\teis\\OneDrive\\Dokumenter\\Skole\\SDU\\Software\\7. semester\\4. Development\\HesehusCampaignEngine\\HesehusCampaignEngine\\Test\\TestCases.csv",
+                       "C:\\Users\\teis\\OneDrive\\Dokumenter\\Skole\\SDU\\Software\\7. semester\\4. Development\\HesehusCampaignEngine\\HesehusCampaignEngine\\Test\\TestCases_After_Bugfix.csv",
                        FileMode.Append))
             using (var writer = new StreamWriter(stream))
             using (var csv = new CsvWriter(writer, config))

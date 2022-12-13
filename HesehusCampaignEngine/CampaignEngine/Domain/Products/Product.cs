@@ -19,7 +19,7 @@
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return Id == other.Id && Price == other.Price && SubId == other.SubId;
+            return Id == other.Id && Price == other.Price;
         }
 
         public override bool Equals(object? obj)
@@ -32,7 +32,7 @@
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(Id, Price);
+            return HashCode.Combine(Id, Price, SubId);
         }
         
         public override string ToString()
