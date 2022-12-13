@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics;
 using System.Globalization;
-using CampaignEngine.Domain;
 using CampaignEngine.Domain.Campaigns;
 using CampaignEngine.Domain.Products;
 using CsvHelper;
@@ -36,7 +35,7 @@ public class CampaignEngineTest
 
             var engine = new CampaignEngine.Engine.Engine();
             stopwatch.Restart();
-            var result = engine.CalculatePrice(orderLines, campaigns);
+            var result = engine.CalculatePrice(orderLines, campaigns, -1);
             var timeElapsed = stopwatch.ElapsedMilliseconds;
 
             if (engine.CampaignActivations.Count < 8) continue;
@@ -90,7 +89,7 @@ public class CampaignEngineTest
 
             var engine = new CampaignEngine.Engine.Engine();
             stopwatch.Restart();
-            var result = engine.CalculatePrice(orderLines, campaigns);
+            var result = engine.CalculatePrice(orderLines, campaigns, -1);
             var timeElapsed = stopwatch.ElapsedMilliseconds;
             
             testResults.Add(new TestResult(engine.CampaignActivations.Count,
@@ -103,7 +102,7 @@ public class CampaignEngineTest
                 testCase.Seed));
         }
         
-        using (var writer = new StreamWriter($"C:\\Users\\teis\\OneDrive\\Dokumenter\\Skole\\SDU\\Software\\7. semester\\4. Development\\HesehusCampaignEngine\\HesehusCampaignEngine\\Test\\TestResults_v2_{Guid.NewGuid()}.csv"))
+        using (var writer = new StreamWriter($"C:\\Users\\teis\\OneDrive\\Dokumenter\\Skole\\SDU\\Software\\7. semester\\4. Development\\HesehusCampaignEngine\\HesehusCampaignEngine\\Test\\TestResults_v2_After_Bugfix.csv"))
         using (var csv = new CsvWriter(writer, CultureInfo.CurrentCulture))
         {
             csv.WriteRecords(testResults);

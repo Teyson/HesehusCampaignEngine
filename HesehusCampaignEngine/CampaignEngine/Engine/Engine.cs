@@ -10,50 +10,89 @@ namespace CampaignEngine.Engine
     {
         public HashSet<BasketActivation> BasketActivations = new();
         public List<CampaignActivation> CampaignActivations = new();
-        public CalculatedBasket? CheapestBasket = null;
+
+        public CalculatedBasket CheapestBasket = new(int.MaxValue,
+            new HashSet<CampaignActivation>(),
+            new List<Product>());
+
+        private CancellationToken _timeoutToken;
 
         /// <summary>
         /// Finds the cheapest possible combination of campaigns in the basket.
         /// </summary>
         /// <param name="basketLines">The basket lines in the basket</param>
         /// <param name="campaignsInBasket">The campaigns that affect at least one product in the basket</param>
+        /// <param name="timeoutMs"><para>The max amount of time in ms the code can run.
+        /// If timeout occours the engine returns the best price found in the time.
+        /// It cannot be guaranteed that this is actually the best price.
+        /// A timeout flag on the returned basket can be checked.</para><br/>
+        /// 
+        /// Suggested values:<br/>
+        /// B2B solution with big and complex baskets: 500-1000 ms<br/>
+        /// B2B solution with simple baskets: 250-500 ms<br/>
+        /// B2C solution with big and complex baskets: 250-500 ms<br/>
+        /// B2C solution with simple baskets: 100-250 ms<br/><br/>
+        ///
+        /// A value of -1 means no timeout</param>
         /// <returns>CalculatedBasket with the price</returns>
-        public CalculatedBasket? CalculatePrice(
+        public CalculatedBasket CalculatePrice(
             List<OrderLine> basketLines,
-            HashSet<Campaign> campaignsInBasket)
+            HashSet<Campaign> campaignsInBasket,
+            int timeoutMs)
         {
-            if (!basketLines.Any())
-                return new CalculatedBasket(0, new HashSet<CampaignActivation>(), new List<Product>());
-
-            var products = basketLines.SelectMany(orderLine =>
+            using var cTSource = new CancellationTokenSource();
+            if (timeoutMs == -1)
             {
-                List<Product> products = new();
-                for (var i = 0; i < orderLine.Amount; i++)
-                {
-                    products.Add(new Product(orderLine.Product.Id, orderLine.Product.Price, i));
-                }
+                _timeoutToken = CancellationToken.None;
+                cTSource.Dispose();
+            }
+            else
+            {
+                cTSource.CancelAfter(timeoutMs);
+                _timeoutToken = cTSource.Token;
+            }
 
-                return products;
-            }).ToList();
+            try
+            {
+                if (!basketLines.Any())
+                    return new CalculatedBasket(0, new HashSet<CampaignActivation>(), new List<Product>());
 
-            var allProductsAffectedByCampaigns = campaignsInBasket
-                .SelectMany(x => x.AffectedProducts)
-                .ToHashSet();
+                var products = basketLines.AsParallel().WithCancellation(_timeoutToken).SelectMany(OrderlineMapper.MapOrderlineToEnumerable).ToList();
+                
+                
+                var campaignProductIds = campaignsInBasket
+                    .AsParallel()
+                    .WithCancellation(_timeoutToken)
+                    .SelectMany(x => x.AffectedProducts.Select(product => product.Id))
+                    .ToHashSet();
 
-            var basketProductsOutsideCampaigns = products.Except(allProductsAffectedByCampaigns);
+                var allProductsAffectedByCampaigns = products
+                    .AsParallel()
+                    .WithCancellation(_timeoutToken)
+                    .Where(x => campaignProductIds.Contains(x.Id)).ToHashSet();
 
-            var basketProductsAffectedByCampaigns = products.Except(basketProductsOutsideCampaigns).ToHashSet();
+                CampaignActivations = GenerateCampaignActivations(allProductsAffectedByCampaigns, campaignsInBasket)
+                    .AsParallel()
+                    .WithCancellation(_timeoutToken)
+                    .OrderByDescending(x => x.AffectedProducts.Count)
+                    .ToList();
 
-            CampaignActivations = GenerateCampaignActivations(basketProductsAffectedByCampaigns, campaignsInBasket)
-                .OrderByDescending(x => x.AffectedProducts.Count)
-                .ToList();
-
-            var campaignOverlaps = GenerateCampaignOverlaps();
-
-            if (CampaignActivations.Any())
-                GenerateBasketActivations(0, new BasketActivation(), campaignOverlaps, products);
-
-            return CheapestBasket;
+                var campaignOverlaps = GenerateCampaignOverlaps();
+                
+                if (CampaignActivations.Any())
+                    GenerateBasketActivations(0, new BasketActivation(), campaignOverlaps, products);
+                else
+                    CheapestBasket = new CalculatedBasket(products.Sum(x => x.Price), 
+                        new HashSet<CampaignActivation>(), 
+                        new List<Product>());
+                
+                return CheapestBasket;
+            }
+            catch (OperationCanceledException e)
+            {
+                CheapestBasket.Timeout = true;
+                return CheapestBasket;
+            }
         }
 
         private UndirectedGraph<CampaignActivation> GenerateCampaignOverlaps()
@@ -61,16 +100,19 @@ namespace CampaignEngine.Engine
             var graph = new UndirectedGraph<CampaignActivation>(CampaignActivations);
 
             for (var i = 0; i < CampaignActivations.Count; i++)
-            for (var j = i + 1; j < CampaignActivations.Count; j++)
             {
-                if (i == j)
-                    continue;
+                _timeoutToken.ThrowIfCancellationRequested();
+                for (var j = i + 1; j < CampaignActivations.Count; j++)
+                {
+                    if (i == j)
+                        continue;
 
-                var campaignActivation1 = CampaignActivations[i];
-                var campaignActivation2 = CampaignActivations[j];
+                    var campaignActivation1 = CampaignActivations[i];
+                    var campaignActivation2 = CampaignActivations[j];
 
-                if (campaignActivation1.HasOverlap(campaignActivation2))
-                    graph.AddEdge(CampaignActivations[i], CampaignActivations[j]);
+                    if (campaignActivation1.HasOverlap(campaignActivation2))
+                        graph.AddEdge(CampaignActivations[i], CampaignActivations[j]);
+                }
             }
 
             return graph;
@@ -84,8 +126,10 @@ namespace CampaignEngine.Engine
 
             foreach (var campaign in campaigns)
             {
+                _timeoutToken.ThrowIfCancellationRequested();
+
                 var productsInCampaign = productsAffectedByCampaigns
-                    .Where(x => campaign.AffectedProducts.Contains(x))
+                    .Where(x => campaign.AffectedProducts.Select(product => product.Id).Contains(x.Id))
                     .ToList();
 
                 var combinationsForCampaign = GenerateCampaignActivationsForCampaign(
@@ -167,22 +211,24 @@ namespace CampaignEngine.Engine
             {
                 unfinishedBasketActivation.UpdateUnaffectedProducts(products);
                 unfinishedBasketActivation.UpdateTotal();
-                
-                if (CheapestBasket == null || CheapestBasket.Total < unfinishedBasketActivation.Total)
+
+                if (unfinishedBasketActivation.Total < CheapestBasket.Total)
                     CheapestBasket = new CalculatedBasket(unfinishedBasketActivation.Total,
                         unfinishedBasketActivation.CampaignsInEffect, unfinishedBasketActivation.UnaffectedProducts);
+
+                _timeoutToken.ThrowIfCancellationRequested();
             }
             else
             {
                 var s = unfinishedBasketActivation.Clone();
                 GenerateBasketActivations(i + 1, s, campaignOverlaps, products);
 
-                if (!unfinishedBasketActivation.HasOverlap(CampaignActivations[i], campaignOverlaps))
-                {
-                    var s2 = unfinishedBasketActivation.Clone();
-                    s2.CampaignsInEffect.Add(CampaignActivations[i]);
-                    GenerateBasketActivations(i + 1, s2, campaignOverlaps, products);
-                }
+                if (unfinishedBasketActivation.HasOverlap(CampaignActivations[i], campaignOverlaps))
+                    return;
+
+                var s2 = unfinishedBasketActivation.Clone();
+                s2.CampaignsInEffect.Add(CampaignActivations[i]);
+                GenerateBasketActivations(i + 1, s2, campaignOverlaps, products);
             }
         }
 
