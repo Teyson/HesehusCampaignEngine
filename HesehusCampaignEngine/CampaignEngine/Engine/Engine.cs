@@ -15,16 +15,10 @@ namespace CampaignEngine.Engine
         /// </summary>
         /// <param name="basketLines">The basket lines in the basket</param>
         /// <param name="campaignsInBasket">The campaigns that affect at least one product in the basket</param>
-        /// <param name="useCheckEarlierOptimisation"></param>
-        /// <param name="useCheckLaterOptimisation"></param>
-        /// <param name="useSortingOptimisation"></param>
         /// <returns>CalculatedBasket with the price</returns>
         public CalculatedBasket? CalculatePrice(
             List<OrderLine> basketLines,
-            HashSet<Campaign> campaignsInBasket,
-            bool useCheckEarlierOptimisation = true,
-            bool useCheckLaterOptimisation = true,
-            bool useSortingOptimisation = true)
+            HashSet<Campaign> campaignsInBasket)
         {
             if (!basketLines.Any())
                 return new CalculatedBasket(0, new HashSet<CampaignActivation>(), new List<Product>());
