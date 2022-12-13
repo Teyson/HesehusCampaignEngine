@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using CampaignEngine.Domain.Campaigns;
+﻿using CampaignEngine.Domain.Campaigns;
+using CampaignEngine.Domain.Products;
 using CampaignEngine.Domain.UndirectedGraph;
 
-namespace CampaignEngine.Domain
+namespace CampaignEngine.Domain.Baskets
 {
     public class BasketActivation
     {

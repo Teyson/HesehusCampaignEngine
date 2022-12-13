@@ -1,5 +1,7 @@
 ﻿using CampaignEngine.Domain;
+using CampaignEngine.Domain.Baskets;
 using CampaignEngine.Domain.Campaigns;
+using CampaignEngine.Domain.Products;
 using CampaignEngine.Domain.UndirectedGraph;
 
 namespace CampaignEngine.Engine

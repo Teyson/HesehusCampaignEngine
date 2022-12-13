@@ -1,4 +1,7 @@
-﻿namespace CampaignEngine.Domain
+﻿using CampaignEngine.Domain.Campaigns;
+using CampaignEngine.Domain.Products;
+
+namespace CampaignEngine.Domain.Baskets
 {
     public class CalculatedBasket
     {

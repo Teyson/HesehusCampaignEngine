@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using CampaignEngine.Domain.Products;
 
 namespace CampaignEngine.Domain.Campaigns
 {
