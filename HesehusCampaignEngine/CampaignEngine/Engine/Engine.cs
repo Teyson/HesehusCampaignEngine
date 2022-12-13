@@ -1,14 +1,14 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using CampaignEngine.Domain;
+﻿using CampaignEngine.Domain;
 using CampaignEngine.Domain.Campaigns;
+using CampaignEngine.Domain.UndirectedGraph;
 
 namespace CampaignEngine.Engine
 {
     public class Engine
     {
-        public HashSet<BasketActivation> _basketActivations = new();
-        public List<CampaignActivation> _campaignActivations = new();
+        public HashSet<BasketActivation> BasketActivations = new();
+        public List<CampaignActivation> CampaignActivations = new();
+        public CalculatedBasket? CheapestBasket = null;
 
         /// <summary>
         /// Finds the cheapest possible combination of campaigns in the basket.
@@ -16,7 +16,9 @@ namespace CampaignEngine.Engine
         /// <param name="basketLines">The basket lines in the basket</param>
         /// <param name="campaignsInBasket">The campaigns that affect at least one product in the basket</param>
         /// <returns>CalculatedBasket with the price</returns>
-        public CalculatedBasket CalculatePrice(List<OrderLine> basketLines, HashSet<Campaign> campaignsInBasket)
+        public CalculatedBasket? CalculatePrice(
+            List<OrderLine> basketLines,
+            HashSet<Campaign> campaignsInBasket)
         {
             if (!basketLines.Any())
                 return new CalculatedBasket(0, new HashSet<CampaignActivation>(), new List<Product>());
@@ -40,14 +42,36 @@ namespace CampaignEngine.Engine
 
             var basketProductsAffectedByCampaigns = products.Except(basketProductsOutsideCampaigns).ToHashSet();
 
-            _campaignActivations = GenerateCampaignActivations(basketProductsAffectedByCampaigns, campaignsInBasket);
+            CampaignActivations = GenerateCampaignActivations(basketProductsAffectedByCampaigns, campaignsInBasket)
+                .OrderByDescending(x => x.AffectedProducts.Count)
+                .ToList();
 
-            if (_campaignActivations.Any())
-                GenerateBasketActivations(0, new BasketActivation());
+            var campaignOverlaps = GenerateCampaignOverlaps();
 
-            var cheapestBasket = GetCheapestBasketActivation(products);
+            if (CampaignActivations.Any())
+                GenerateBasketActivations(0, new BasketActivation(), campaignOverlaps, products);
 
-            return cheapestBasket;
+            return CheapestBasket;
+        }
+
+        private UndirectedGraph<CampaignActivation> GenerateCampaignOverlaps()
+        {
+            var graph = new UndirectedGraph<CampaignActivation>(CampaignActivations);
+
+            for (var i = 0; i < CampaignActivations.Count; i++)
+            for (var j = i + 1; j < CampaignActivations.Count; j++)
+            {
+                if (i == j)
+                    continue;
+
+                var campaignActivation1 = CampaignActivations[i];
+                var campaignActivation2 = CampaignActivations[j];
+
+                if (campaignActivation1.HasOverlap(campaignActivation2))
+                    graph.AddEdge(CampaignActivations[i], CampaignActivations[j]);
+            }
+
+            return graph;
         }
 
         private List<CampaignActivation> GenerateCampaignActivations(
@@ -76,7 +100,7 @@ namespace CampaignEngine.Engine
             List<Product> productsHitByCampaign,
             Campaign campaign)
         {
-            Product[] tempActivation = new Product[campaign.ProductsToActivate];
+            var tempActivation = new Product[campaign.ProductsToActivate];
 
             List<Product[]> activations = new();
 
@@ -118,7 +142,7 @@ namespace CampaignEngine.Engine
             for (var i = start; i <= end && end - i + 1 >= campaignProductsToActivate - index; i++)
             {
                 tempActivation[index] = productsHitByCampaign[i];
-                var tempActivation2 = (Product[])tempActivation.Clone();
+                var tempActivation2 = (Product[]) tempActivation.Clone();
                 GenerateCampaignActivation(
                     productsHitByCampaign,
                     tempActivation2,
@@ -133,29 +157,42 @@ namespace CampaignEngine.Engine
 
         private void GenerateBasketActivations(
             int i,
-            BasketActivation unfinishedBasketActivation)
+            BasketActivation unfinishedBasketActivation,
+            UndirectedGraph<CampaignActivation> campaignOverlaps,
+            List<Product> products)
         {
-            if (i >= _campaignActivations.Count)
-                _basketActivations.Add(unfinishedBasketActivation);
+            if (i >= CampaignActivations.Count)
+            {
+                unfinishedBasketActivation.UpdateUnaffectedProducts(products);
+                unfinishedBasketActivation.UpdateTotal();
+                
+                if (CheapestBasket == null || CheapestBasket.Total < unfinishedBasketActivation.Total)
+                    CheapestBasket = new CalculatedBasket(unfinishedBasketActivation.Total,
+                        unfinishedBasketActivation.CampaignsInEffect, unfinishedBasketActivation.UnaffectedProducts);
+            }
             else
             {
                 var s = unfinishedBasketActivation.Clone();
-                GenerateBasketActivations(i + 1, s);
-                var s2 = unfinishedBasketActivation.Clone();
-                s2.CampaignsInEffect.Add(_campaignActivations[i]);
-                GenerateBasketActivations(i + 1, s2);
+                GenerateBasketActivations(i + 1, s, campaignOverlaps, products);
+
+                if (!unfinishedBasketActivation.HasOverlap(CampaignActivations[i], campaignOverlaps))
+                {
+                    var s2 = unfinishedBasketActivation.Clone();
+                    s2.CampaignsInEffect.Add(CampaignActivations[i]);
+                    GenerateBasketActivations(i + 1, s2, campaignOverlaps, products);
+                }
             }
         }
 
         private CalculatedBasket GetCheapestBasketActivation(List<Product> products)
         {
             BasketActivation cheapest = new() {Total = decimal.MaxValue};
-            if (!_basketActivations.Any())
+            if (!BasketActivations.Any())
             {
-                _basketActivations.Add(new BasketActivation(products, new HashSet<CampaignActivation>(), 0));
+                BasketActivations.Add(new BasketActivation(products, new HashSet<CampaignActivation>(), 0));
             }
 
-            foreach (var basketActivation in _basketActivations)
+            foreach (var basketActivation in BasketActivations)
             {
                 var valid = basketActivation.IsValid();
 

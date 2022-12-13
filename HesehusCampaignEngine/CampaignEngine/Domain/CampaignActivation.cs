@@ -21,5 +21,10 @@ namespace CampaignEngine.Domain
         {
             return AffectedProducts.Contains(p);
         }
+
+        public bool HasOverlap(CampaignActivation other)
+        {
+            return other.AffectedProducts.Any(Contains);
+        }
     }
 }

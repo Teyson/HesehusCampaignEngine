@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using CampaignEngine.Domain.Campaigns;
+using CampaignEngine.Domain.UndirectedGraph;
 
 namespace CampaignEngine.Domain
 {
@@ -39,6 +40,20 @@ namespace CampaignEngine.Domain
             total += CampaignsInEffect.Sum(campaignActivation => campaignActivation.Total);
 
             Total = total;
+        }
+
+        public bool HasOverlap(CampaignActivation activation, UndirectedGraph<CampaignActivation> graphOfOverlaps)
+        {
+            foreach (var campaignActivation in CampaignsInEffect)
+            {
+                var adjacencyList = graphOfOverlaps.GetAdjacency(campaignActivation);
+                var overlaps = adjacencyList.Contains(activation);
+
+                if (overlaps)
+                    return true;
+            }
+
+            return false;
         }
 
         public BasketActivation Clone()
