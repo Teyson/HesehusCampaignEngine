@@ -8,11 +8,13 @@ namespace CampaignEngine.Domain.Baskets
         public CalculatedBasket(
             decimal total,
             HashSet<CampaignActivation> activatedCampaigns,
-            List<Product> unaffectedProducts)
+            List<Product> unaffectedProducts,
+            bool timeout = false)
         {
             Total = total;
             ActivatedCampaigns = activatedCampaigns;
             UnaffectedProducts = unaffectedProducts;
+            Timeout = timeout;
         }
 
         public decimal Total { get; set; }
@@ -20,5 +22,7 @@ namespace CampaignEngine.Domain.Baskets
         public HashSet<CampaignActivation> ActivatedCampaigns { get; set; }
         
         public List<Product> UnaffectedProducts { get; set; }
+
+        public bool Timeout { get; set; }
     }
 }

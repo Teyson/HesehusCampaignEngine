@@ -30,12 +30,12 @@ namespace Test.Engine
 
             //Act
             var calculatedBasket =
-                _engine.CalculatePrice(basketLines, new HashSet<Campaign>());
+                _engine.CalculatePrice(basketLines, new HashSet<Campaign>(), -1);
 
             //Assert
             Assert.That(calculatedBasket.Total, Is.EqualTo(300));
         }
-        
+
         [Test]
         public void CalculatePrice_Returns_CorrectPrice_AverageStress()
         {
@@ -65,7 +65,7 @@ namespace Test.Engine
 
             //Act
             var calculatedBasket =
-                _engine.CalculatePrice(basketLines, campaigns);
+                _engine.CalculatePrice(basketLines, campaigns, -1);
 
             //Assert
             Assert.That(calculatedBasket.Total, Is.EqualTo(500));
@@ -110,7 +110,7 @@ namespace Test.Engine
             //Act
             var stopwatch = Stopwatch.StartNew();
             var calculatedBasket =
-                _engine.CalculatePrice(basketLines, campaigns);
+                _engine.CalculatePrice(basketLines, campaigns, -1);
 
             var elapsed = stopwatch.Elapsed.TotalSeconds;
             Console.WriteLine(elapsed);
@@ -130,31 +130,46 @@ namespace Test.Engine
             var engine = new CampaignEngine.Engine.Engine();
 
             //Act
-            var basket = engine.CalculatePrice(orderLines, campaigns);
+            var basket = engine.CalculatePrice(orderLines, campaigns, -1);
 
             //Assert
             Assert.That(basket.Total, Is.EqualTo(0));
         }
 
         [Test]
-        public void Case_20_Products_Activation3_All_Overlap()
+        public void Case_6_Of_Same_Product_Activation3_All_Overlap()
         {
             //Arrange
             var p = new Product("test", 100);
             var c = new SetPriceCampaign("0", new HashSet<Product>() {p}, 3, 50);
-            var orderLines = new List<OrderLine>() {new(p, 20)};
+            var orderLines = new List<OrderLine>() {new(p, 6)};
 
-            for (var i = 0; i < 10; i++)
-            {
-                var engine = new CampaignEngine.Engine.Engine();
-                //Act
-                var stopWatch = Stopwatch.StartNew();
-                var basket = engine.CalculatePrice(orderLines, new HashSet<Campaign>() {c});
-                var elapsed = stopWatch.ElapsedMilliseconds;
+            var engine = new CampaignEngine.Engine.Engine();
+            //Act
+            var stopWatch = Stopwatch.StartNew();
+            var basket = engine.CalculatePrice(orderLines, new HashSet<Campaign>() {c}, -1);
+            var elapsed = stopWatch.ElapsedMilliseconds;
 
-                //Assert
-                Console.WriteLine($"ElapsedTime = {elapsed}");
-            }
+            //Assert
+            Console.WriteLine($"ElapsedTime = {elapsed}");
+            Assert.That(basket.Total, Is.EqualTo(100));
+        }
+
+
+        [Test]
+        public void Timeout_Happens()
+        {
+            //Arrange
+            var p = new Product("test", 100);
+            var c = new SetPriceCampaign("0", new HashSet<Product>() {p}, 3, 50);
+            var orderLines = new List<OrderLine>() {new(p, 1_000_000)};
+            var engine = new CampaignEngine.Engine.Engine();
+
+            //Act
+            var basket = engine.CalculatePrice(orderLines, new HashSet<Campaign>() {c}, 500);
+
+            //Assert
+            Assert.True(basket.Timeout);
         }
     }
 }
