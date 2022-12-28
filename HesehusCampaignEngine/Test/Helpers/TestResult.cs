@@ -10,6 +10,7 @@ public class TestResult
     public int AmountOfCampaignsLowerBound {get; set;}
     public int AmountOfCampaignsUpperBound {get; set;}
     public int Seed { get; set; }
+    public long TotalBytesOfMemoryUsed { get; set; } = 0;
 
     public TestResult(
         int n,

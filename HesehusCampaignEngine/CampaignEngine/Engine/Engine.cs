@@ -8,7 +8,6 @@ namespace CampaignEngine.Engine
 {
     public class Engine
     {
-        public HashSet<BasketActivation> BasketActivations = new();
         public List<CampaignActivation> CampaignActivations = new();
 
         public CalculatedBasket CheapestBasket = new(int.MaxValue,
@@ -215,7 +214,7 @@ namespace CampaignEngine.Engine
                 if (unfinishedBasketActivation.Total < CheapestBasket.Total)
                     CheapestBasket = new CalculatedBasket(unfinishedBasketActivation.Total,
                         unfinishedBasketActivation.CampaignsInEffect, unfinishedBasketActivation.UnaffectedProducts);
-
+                 
                 _timeoutToken.ThrowIfCancellationRequested();
             }
             else
@@ -230,29 +229,6 @@ namespace CampaignEngine.Engine
                 s2.CampaignsInEffect.Add(CampaignActivations[i]);
                 GenerateBasketActivations(i + 1, s2, campaignOverlaps, products);
             }
-        }
-
-        private CalculatedBasket GetCheapestBasketActivation(List<Product> products)
-        {
-            BasketActivation cheapest = new() {Total = decimal.MaxValue};
-            if (!BasketActivations.Any())
-            {
-                BasketActivations.Add(new BasketActivation(products, new HashSet<CampaignActivation>(), 0));
-            }
-
-            foreach (var basketActivation in BasketActivations)
-            {
-                var valid = basketActivation.IsValid();
-
-                if (!valid) continue;
-
-                basketActivation.UpdateUnaffectedProducts(products);
-                basketActivation.UpdateTotal();
-                if (basketActivation.Total < cheapest.Total)
-                    cheapest = basketActivation;
-            }
-
-            return new CalculatedBasket(cheapest.Total, cheapest.CampaignsInEffect, cheapest.UnaffectedProducts);
         }
     }
 }

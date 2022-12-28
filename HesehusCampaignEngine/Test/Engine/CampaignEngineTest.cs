@@ -11,15 +11,16 @@ namespace Test.Engine;
 public class CampaignEngineTest
 {
     private const int AmountOfProductsLowerBound = 2;
-    private const int AmountOfProductsUpperBound = 7;
+    private const int AmountOfProductsUpperBound = 10;
     private const int AmountOfCampaignsLowerBound = 2;
     private const int AmountOfCampaignsUpperBound = 10;
 
     public static void GenerateTestCase()
     {
+        
         var stopwatch = Stopwatch.StartNew();
 
-        for (var k = 0; k < 1000; k++)
+        for (var k = 0; k < 10000; k++)
         {
             var seed = Guid.NewGuid().GetHashCode();
             var rng = new Random(seed);
@@ -37,8 +38,11 @@ public class CampaignEngineTest
             stopwatch.Restart();
             var result = engine.CalculatePrice(orderLines, campaigns, -1);
             var timeElapsed = stopwatch.ElapsedMilliseconds;
+            var currentProcess = Process.GetCurrentProcess();
+            var totalBytesOfMemoryUsed = currentProcess.WorkingSet64;
 
-            if (engine.CampaignActivations.Count < 8) continue;
+            var n = engine.CampaignActivations.Count;
+            if (timeElapsed <= 0 || n < 8 || n > 100) continue;
             
             var config = new CsvConfiguration(CultureInfo.CurrentCulture)
             {
@@ -46,7 +50,7 @@ public class CampaignEngineTest
             };
 
             using (var stream = File.Open(
-                       "C:\\Users\\teis\\OneDrive\\Dokumenter\\Skole\\SDU\\Software\\7. semester\\4. Development\\HesehusCampaignEngine\\HesehusCampaignEngine\\Test\\TestCases_v2.csv",
+                       "C:\\Users\\teis\\OneDrive\\Dokumenter\\Skole\\SDU\\Software\\7. semester\\4. Development\\HesehusCampaignEngine\\HesehusCampaignEngine\\Test\\Mass_test_v2.csv",
                        FileMode.Append))
             using (var writer = new StreamWriter(stream))
             using (var csv = new CsvWriter(writer, config))
@@ -54,14 +58,14 @@ public class CampaignEngineTest
                 csv.WriteRecords(new List<TestResult>
                 {
                     new(
-                        engine.CampaignActivations.Count,
+                        n,
                         timeElapsed,
                         engine.BasketActivations.Count,
                         AmountOfProductsLowerBound,
                         AmountOfProductsUpperBound,
                         AmountOfCampaignsLowerBound,
                         AmountOfCampaignsUpperBound,
-                        seed)
+                        seed){TotalBytesOfMemoryUsed = totalBytesOfMemoryUsed}
                 });
             }
         }
@@ -91,18 +95,21 @@ public class CampaignEngineTest
             stopwatch.Restart();
             var result = engine.CalculatePrice(orderLines, campaigns, -1);
             var timeElapsed = stopwatch.ElapsedMilliseconds;
+            var currentProcess = Process.GetCurrentProcess();
+            var totalBytesOfMemoryUsed = currentProcess.WorkingSet64;
+
             
             testResults.Add(new TestResult(engine.CampaignActivations.Count,
                 timeElapsed,
                 engine.BasketActivations.Count,
-                AmountOfProductsLowerBound,
-                AmountOfProductsUpperBound,
-                AmountOfCampaignsLowerBound,
-                AmountOfCampaignsUpperBound,
-                testCase.Seed));
+                testCase.AmountOfProductsLowerBound,
+                testCase.AmountOfProductsUpperBound,
+                testCase.AmountOfCampaignsLowerBound,
+                testCase.AmountOfCampaignsUpperBound,
+                testCase.Seed) {TotalBytesOfMemoryUsed = totalBytesOfMemoryUsed});
         }
         
-        using (var writer = new StreamWriter($"C:\\Users\\teis\\OneDrive\\Dokumenter\\Skole\\SDU\\Software\\7. semester\\4. Development\\HesehusCampaignEngine\\HesehusCampaignEngine\\Test\\TestResults_v2_After_Bugfix.csv"))
+        using (var writer = new StreamWriter($"C:\\Users\\teis\\OneDrive\\Dokumenter\\Skole\\SDU\\Software\\7. semester\\4. Development\\HesehusCampaignEngine\\HesehusCampaignEngine\\Test\\Mass_test_v2_with_memory.csv"))
         using (var csv = new CsvWriter(writer, CultureInfo.CurrentCulture))
         {
             csv.WriteRecords(testResults);
@@ -114,11 +121,13 @@ public class CampaignEngineTest
         var config = new CsvConfiguration(CultureInfo.CurrentCulture)
         {
             PrepareHeaderForMatch = args => args.Header.ToLower(),
+            HeaderValidated = null,
+            MissingFieldFound = null,
         };
 
         using (var reader =
                new StreamReader(
-                   "C:\\Users\\teis\\OneDrive\\Dokumenter\\Skole\\SDU\\Software\\7. semester\\4. Development\\HesehusCampaignEngine\\HesehusCampaignEngine\\Test\\TestCases.csv"))
+                   "C:\\Users\\teis\\OneDrive\\Dokumenter\\Skole\\SDU\\Software\\7. semester\\4. Development\\HesehusCampaignEngine\\HesehusCampaignEngine\\Test\\TestCases_After_Bugfix.csv"))
         using (var csv = new CsvReader(reader, config))
         {
             return csv.GetRecords<TestResult>().ToList();
@@ -156,8 +165,7 @@ public class CampaignEngineTest
 
         for (var i = 0; i < amountOfCampaigns; i++)
         {
-            var keepRngSeed = rng.Next(1, products.Count);
-            var numberOfAffectedProducts = products.Count / 2;
+            var numberOfAffectedProducts = rng.Next(1, products.Count);
             var affectedProducts = products.OrderBy(x => rng.Next()).Take(numberOfAffectedProducts).ToHashSet();
             var productsToActivate = rng.Next(1, affectedProducts.Count);
 
